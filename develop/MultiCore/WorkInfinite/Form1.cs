@@ -95,13 +95,20 @@ namespace WorkInfinite
             var asm = Assembly.GetEntryAssembly();
             var psi = new ProcessStartInfo(asm.Location);
             psi.Arguments = "計算しろ!";
-            var p = Process.Start(psi);
 
-            while (!p.HasExited)
-                Application.DoEvents();
-            //p.WaitForExit();
+            var p = new Process();
+            p.StartInfo = psi;
+            p.EnableRaisingEvents = true;
+            p.Exited += OnProcessExited;
+            p.SynchronizingObject = this;
+            p.Start();            
+
+        }
+
+        private void OnProcessExited(object sender, EventArgs e)
+        {
+            var p = sender as Process;
             this.label1.Text = string.Format("非同期処理終了: {0}", p.ExitCode);
-
         }
 
         private System.Timers.Timer _timer;
