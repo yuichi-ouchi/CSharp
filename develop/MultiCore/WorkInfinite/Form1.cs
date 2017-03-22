@@ -16,6 +16,8 @@ namespace WorkInfinite
         public bool CanStart { get { return !IsRunning; } }
         public bool CanStop { get { return IsRunning; } }
 
+        #region Events
+        
         private void Form1_Load(object sender, EventArgs e)
         {
             this.StartButton.Enabled = true;
@@ -32,6 +34,14 @@ namespace WorkInfinite
             }
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.IsRunning = false;
+            Environment.ExitCode = this._currentJ; //終了コード
+        }
+
+        #endregion
+
         private void StartButton_Click(object sender, EventArgs e)
         {
             this.StartButton.Enabled = false;
@@ -40,6 +50,7 @@ namespace WorkInfinite
             WorkInfinite();
         }
 
+        private int _currentJ;
         private bool IsRunning;
         private void WorkInfinite()
         {
@@ -55,6 +66,7 @@ namespace WorkInfinite
                         if (!this.IsRunning)
                             return;
 
+                        _currentJ = j;
                         r = (double)i / (double)j;
                         Application.DoEvents();
                     }
@@ -83,7 +95,12 @@ namespace WorkInfinite
             var asm = Assembly.GetEntryAssembly();
             var psi = new ProcessStartInfo(asm.Location);
             psi.Arguments = "計算しろ!";
-            Process.Start(psi);
+            var p = Process.Start(psi);
+
+            while (!p.HasExited)
+                Application.DoEvents();
+            //p.WaitForExit();
+            this.label1.Text = string.Format("非同期処理終了: {0}", p.ExitCode);
 
         }
 
@@ -94,6 +111,7 @@ namespace WorkInfinite
             _timer.SynchronizingObject = this;
 
             if (this.components == null)
+
             {
                 this.components = new System.ComponentModel.Container();
             }
@@ -108,6 +126,7 @@ namespace WorkInfinite
         {
             this.label1.Text = string.Format("現在時刻: {0}秒", e.SignalTime.Second);
         }
+
 
     }
 }
