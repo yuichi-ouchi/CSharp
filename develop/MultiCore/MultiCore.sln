@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkInfinite", "WorkInfinite\WorkInfinite.csproj", "{5C5EA400-ECAF-4627-B3DE-2B9A8225A2CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoCoordination", "DoCoordination\DoCoordination.csproj", "{F9D1BAE3-67F7-4F13-82A1-2BBA7DEF242B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{5C5EA400-ECAF-4627-B3DE-2B9A8225A2CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C5EA400-ECAF-4627-B3DE-2B9A8225A2CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C5EA400-ECAF-4627-B3DE-2B9A8225A2CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9D1BAE3-67F7-4F13-82A1-2BBA7DEF242B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9D1BAE3-67F7-4F13-82A1-2BBA7DEF242B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9D1BAE3-67F7-4F13-82A1-2BBA7DEF242B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9D1BAE3-67F7-4F13-82A1-2BBA7DEF242B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
