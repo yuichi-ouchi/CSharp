@@ -37,6 +37,7 @@
             this.textBox1.Location = new System.Drawing.Point(14, 19);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(258, 198);
             this.textBox1.TabIndex = 0;
@@ -60,6 +61,7 @@
             this.Controls.Add(this.textBox1);
             this.Name = "RequestForm";
             this.Text = "依頼する側";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RequestForm_FormClosing);
             this.Load += new System.EventHandler(this.RequestForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

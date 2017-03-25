@@ -2,20 +2,28 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace DoCoordination
 {
     public partial class RequestForm : Form,INotifyPropertyChanged
     {
+        #region " Constractor "
         public RequestForm()
         {
             InitializeComponent();
+            InitalizeWorkFile();
         }
-
+        private void InitalizeWorkFile()
+        {
+            File.Open(this.WorkFilePath, FileMode.Create).Dispose();
+        }
+        #endregion
 
         const string WorkFileName = "workfile.txt";
         private string WorkFilePath
@@ -25,6 +33,7 @@ namespace DoCoordination
             }
         }
 
+        #region " Properties "
         private string _displayString;
         public string DisplayString
         {
@@ -45,163 +54,25 @@ namespace DoCoordination
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
 
-        private void AppendButton_Click(object sender, EventArgs e)
-        {
-            AppendNewLine();
-            DisplayWorkFile();
-            RunAsync();
-        }
+        #region " common methods "
 
-        private void DisplayWorkFile()
+        private bool IsMainProcess
         {
-            try
+            get
             {
-                this.DisplayString = File.ReadAllText(this.WorkFilePath);
-            }
-            catch (IOException)
-            {
+                return (Environment.GetCommandLineArgs().Length == 1);
             }
         }
 
-        private int _count;
-        private void AppendNewLine()
-        {
-            _count++;
-            using (var writer = new StreamWriter(WorkFilePath, true))
-            {
-                writer.Write("{0},{1}", _count, _count + 1);
-            }
-        }
-
-        private void DoWork()
-        {
-            using (FileStream fs = File.Open(WorkFilePath, FileMode.Open,
-                                            FileAccess.ReadWrite, FileShare.Read))
-            {
-                using (TextReader reader = new StreamReader(fs))
-                {
-                    var records = new List<string>();
-                    while (reader.Peek() >= 0)
-                        records.Add(reader.ReadLine());
-
-                    int targetIndex = FindTargetRecord(records);
-                    if (targetIndex < 0)
-                        return;
-                    
-                    DisplayString = string.Format("処理中: {0}", records[targetIndex]);
-                    Application.DoEvents();
-
-                    int result = this.Calc("aaa"); //時間のかかる処理
-                    records[targetIndex] = string.Format("{0},{1}", records[targetIndex], result);
-                    fs.Position = 0; //先頭シーク
-                    fs.SetLength(0); //ファイル内容の切り捨て
-                    using (TextWriter writer = new StreamWriter(fs))
-                    {
-                        foreach (var line in records)
-                        {
-                            writer.WriteLine(line); //全レコード書き出し
-                        }
-                    }
-                    DisplayString = string.Format("処理完了: {0}", records[targetIndex]);
-                }
-            }
-        }
-
-        private int Calc(string record)
-        {
-            string[] items = record.Split(new char[] { ',', });
-            int x = int.Parse(items[0]);
-            int y = int.Parse(items[1]);
-            Thread.Sleep(1000);
-
-            return x + y;
-        }
-
-        private int FindTargetRecord(object redords)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void RunAsync()
-        {
-            var psi = new ProcessStartInfo(ThisAssemblyPath);
-            psi.Arguments = "計算しろ!";
-
-            var p = new Process();
-            p.StartInfo = psi;
-            p.EnableRaisingEvents = true;
-            p.Exited += OnProcessExited;
-            p.SynchronizingObject = this;
-            p.Start();
-        }
-        private string ThisAssemblyPath
-        {
-
-            get {
-                var asm = Assembly.GetEntryAssembly();
-                return asm.Location;
-            }
-        }
-
-
-        private void OnProcessExited(object sender, EventArgs e)
-        {
-            StopTimer();
-
-            var p = sender as Process;
-            DisplayString = string.Format("非同期処理終了: {0}", p.ExitCode);
-        }
-
-        private System.Timers.Timer _timer;
-        private void StartTimer()
-        {
-            _timer = new System.Timers.Timer();
-            _timer.SynchronizingObject = this;
-
-            if (this.components == null)
-                this.components = new Container();
-            this.components.Add(_timer);
-
-            //_timer.Elapsed += new ElapsedEventHandler(OnTimerEvent);
-            _timer.Interval = 1000;
-            _timer.Start();
-        }
-
-        private void StopTimer()
-        {
-            if (_timer == null)
-                return;
-
-            _timer.Stop();
-            _timer.Dispose();
-            _timer = null;
-        }
-
-        private void RequestForm_Load(object sender, EventArgs e)
-        {
-            this.textBox1.DataBindings.Add("Text", this, "DisplayString");
-            if (Environment.GetCommandLineArgs().Length > 1)
-            {
-
-            }
-            else
-            { 
-                InitalizeWorkFile();
-            }
-        }
-
-        private void InitalizeWorkFile()
-        {
-            File.Open(this.WorkFilePath, FileMode.Create);
-        }
         private Stream OpenWorkfileWithRetry()
         {
             const int RetryCountMax = 5;
             const int RetryInterval = 100;
 
             FileStream fs = null;
-            for (int retryCount = RetryCountMax; retryCount > 0, retryCount--)
+            for (int retryCount = RetryCountMax; retryCount > 0; retryCount--)
             {
                 try
                 {
@@ -220,5 +91,286 @@ namespace DoCoordination
             }
             return null;
         }
+
+        private void RequestForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CloseAllProcss();
+            StopTimer();
+        }
+        #endregion
+
+        #region " request side methods "
+        List<Process> _processList = new List<Process>();
+
+        private void AppendButton_Click(object sender, EventArgs e)
+        {
+            AppendNewLine();
+            DisplayWorkFile();
+        }
+
+        private int _count;
+        private void AppendNewLine()
+        {
+            Stream fs = OpenWorkfileWithRetry();
+            if (fs == null)
+                return;
+
+            _count++;
+            using (fs)
+            {
+                fs.Seek(0, SeekOrigin.End);
+                using (TextWriter writer = new StreamWriter(fs))
+                    writer.WriteLine("{0},{1}", _count, _count + 1);
+            }
+        }
+
+        private string ThisAssemblyPath
+        {
+            get
+            {
+                var asm = Assembly.GetEntryAssembly();
+                return asm.Location;
+            }
+        }
+
+        private void OnProcessExited(object sender, EventArgs e)
+        {
+            StopTimer();
+
+            Process p = sender as Process;
+            DisplayString = string.Format("非同期処理終了: {0}", p.ExitCode);
+        }
+
+        private void CloseAllProcss()
+        {
+            foreach (var p in _processList)
+            {
+                if (p != null && !p.HasExited)
+                {
+                    p.CloseMainWindow();
+                }
+            }
+        }
+
+        #endregion
+
+        #region " coordination methods "
+
+        private Point GetStartLocation()
+        {
+            int x = int.Parse(Environment.GetCommandLineArgs()[1]);
+            int y = int.Parse(Environment.GetCommandLineArgs()[2]);
+            return new Point(x, y);
+        }
+
+        private void DisplayWorkFile()
+        {
+            try
+            {
+                this.DisplayString = File.ReadAllText(this.WorkFilePath);
+            }
+            catch (IOException)
+            {
+                //(void)
+            }
+        }
+
+        private void DoWork()
+        {
+
+            int targetIndex;
+            string targetRecord = GetTargetRecord(out targetIndex);
+            if (targetRecord == null)
+                return; //未処理の行はなかった。またはファイルオープン失敗
+
+            this.DisplayString = string.Format("処理中：{0}", targetRecord);
+            Application.DoEvents();
+
+
+            int result = this.Calc(targetRecord); //時間のかかる処理
+            string resultRecord = string.Format("{0},{1}", targetRecord, result);
+
+            //ファイルに書き出し
+            if (!WriteWorkfile(targetIndex, resultRecord))
+            {
+                this.DisplayString = string.Format("書き出し失敗: {0}", resultRecord);
+                return;
+            }
+            this.DisplayString = string.Format("処理完了: {0}", resultRecord);
+        }
+
+        private bool WriteWorkfile(int targetIndex, string resultRceord)
+        {
+            Stream fs = OpenWorkfileWithRetry();
+            if (fs == null)
+                return false; // 計算が無駄になるがあきらめる
+
+            using (fs)
+            using (TextReader reader = new StreamReader(fs))
+            {
+                List<string> newRecords = new List<string>();
+                while (reader.Peek() >= 0)
+                    newRecords.Add(reader.ReadLine()); //全レコードを読み込む
+
+#if DEBUG
+                //該当レコードをチェック
+                string[] items = newRecords[targetIndex].Split(new char[] { ',', });
+                if (items.Length > 2)
+                    throw new ApplicationException(
+                        string.Format("すでに計算済みの行です:{0}", newRecords[targetIndex])
+                        );
+#endif
+                //計算結果
+                newRecords[targetIndex] = resultRceord;
+                fs.Position = 0;
+                fs.SetLength(0);
+                using (TextWriter writer = new StreamWriter(fs))
+                {
+                    foreach (var line in newRecords)
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+            return true;
+        }
+
+        private string GetTargetRecord(out int targetIndex)
+        {
+            targetIndex = -1;
+
+            List<string> records = ReadWorkfile();
+            if (records == null) //ファイルが空、またはオープン失敗
+                return null;
+
+            targetIndex = FindTargetRecord(records); //未処理の行を探す
+            if (targetIndex < 0)
+                return null; //未処理の行なし
+
+            return records[targetIndex];
+        }
+
+        private List<string> ReadWorkfile()
+        {
+            Stream fs = OpenWorkfileWithRetry();
+            if (fs == null)
+                return null;
+
+            using (fs)
+            using (TextReader reader = new StreamReader(fs))
+            {
+                List<string> records = new List<string>();
+                while (reader.Peek() >= 0)
+                    records.Add(reader.ReadLine());
+                return records;
+            }
+        }
+
+        private int Calc(string record)
+        {
+            string[] items = record.Split(new char[] { ',', });
+            int x = int.Parse(items[0]);
+            int y = int.Parse(items[1]);
+
+            Thread.Sleep(1000);
+
+            return x + y;
+        }
+
+        private int FindTargetRecord(List<string> records)
+        {
+            for (int i = 0; i < records.Count; i++)
+            {
+                string[] items = records[i].Split(new char[] { ',', });
+                if (items.Length == 2) //未処理の行
+                    return i;
+            }
+            return -1;
+        }
+
+        private void RunAsync()
+        {
+            var psi = new ProcessStartInfo(ThisAssemblyPath);
+            psi.Arguments = String.Format("{0},{1}", this.Location.X + this.Width, this.Location.Y);
+
+            var p = new Process();
+            p.StartInfo = psi;
+            p.EnableRaisingEvents = true;
+            p.Exited += new EventHandler(OnProcessExited);
+            p.SynchronizingObject = this;
+            p.Start();
+
+            this._processList.Add(p);
+        }
+        #endregion
+        
+        #region " Timer "
+        private System.Timers.Timer _timer;
+
+        private void StartTimer(ElapsedEventHandler timerEventHandler, int interval)
+        {
+            if (_timer != null)
+                return;
+
+            _timer = new System.Timers.Timer();
+            _timer.SynchronizingObject = this;
+
+            if (this.components == null)
+                this.components = new Container();
+            this.components.Add(_timer);
+
+            _timer.Elapsed += new ElapsedEventHandler(timerEventHandler);
+            _timer.Interval = interval;
+            _timer.Start();
+        }
+
+        public void OnTimerEventMain(object sender, ElapsedEventArgs e)
+        {
+            _timer.Stop();
+            DisplayWorkFile();
+            _timer.Start();
+        }
+
+        public void OnTimerEventAsync(object sender, ElapsedEventArgs e)
+        {
+            _timer.Stop();
+            DoWork();
+            _timer.Start();
+        }
+
+        private void StopTimer()
+        {
+            if (_timer == null)
+                return;
+
+            _timer.Stop();
+            _timer.Dispose();
+            _timer = null;
+        }
+
+        private void RequestForm_Load(object sender, EventArgs e)
+        {
+            this.textBox1.DataBindings.Add("Text", this, "DisplayString");
+            if (IsMainProcess)
+            {
+                this.Text = "依頼する側";
+                this.Show();
+                RunAsync();
+                StartTimer(new ElapsedEventHandler(OnTimerEventMain), 1000);
+            }
+            else
+            {
+                this.Text = string.Format("非同期処理 - {0}", Process.GetCurrentProcess().Id);
+                this.AppendButton.Enabled = false;
+                this.ControlBox = false;
+                this.StartPosition = FormStartPosition.Manual;
+                //this.Location = GetStartLocation();
+                //タイマーの時間より短いと再入が発生する想定
+                StartTimer(new ElapsedEventHandler(OnTimerEventAsync), 300);
+            }
+        }
+        #endregion
+
+
     }
 }
