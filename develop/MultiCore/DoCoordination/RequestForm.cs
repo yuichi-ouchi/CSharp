@@ -17,7 +17,7 @@ namespace DoCoordination
         public RequestForm()
         {
             InitializeComponent();
-            InitalizeWorkFile();
+            //InitalizeWorkFile();
         }
         private void InitalizeWorkFile()
         {
@@ -174,8 +174,11 @@ namespace DoCoordination
                 //(void)
             }
         }
-
-        private void DoWork()
+        
+        /// <summary>
+        /// 単体テスト可能にするためinternalアクセス
+        /// </summary>
+        internal void DoWork()
         {
 
             int targetIndex;
@@ -283,24 +286,36 @@ namespace DoCoordination
             {
                 string[] items = records[i].Split(new char[] { ',', });
                 if (items.Length == 2) //未処理の行
-                    return i;
+                    if ((int.Parse(items[0]) % divisor) == remainder)
+                        return i;
             }
             return -1;
         }
 
         private void RunAsync()
         {
-            var psi = new ProcessStartInfo(ThisAssemblyPath);
-            psi.Arguments = String.Format("{0},{1}", this.Location.X + this.Width, this.Location.Y);
+            const int ProcessCount = 2;
+            for (int i = 0; i < ProcessCount; i++)
+            {
+                var psi = new ProcessStartInfo(ThisAssemblyPath);
+                //psi.Arguments = String.Format("{0} {1}", this.Location.X + this.Width, this.Location.Y);
+                psi.Arguments = string.Format("{0} {1} {2} {3}",
+                    this.Location.X + this.Width * (i + 1),
+                    this.Location.Y,
+                    ProcessCount,
+                    i
+                    );
 
-            var p = new Process();
-            p.StartInfo = psi;
-            p.EnableRaisingEvents = true;
-            p.Exited += new EventHandler(OnProcessExited);
-            p.SynchronizingObject = this;
-            p.Start();
+                var p = new Process();
+                p.StartInfo = psi;
+                p.EnableRaisingEvents = true;
+                p.Exited += new EventHandler(OnProcessExited);
+                p.SynchronizingObject = this;
+                p.Start();
 
-            this._processList.Add(p);
+                this._processList.Add(p);
+            }
+
         }
         #endregion
         
@@ -351,6 +366,14 @@ namespace DoCoordination
         private void RequestForm_Load(object sender, EventArgs e)
         {
             this.textBox1.DataBindings.Add("Text", this, "DisplayString");
+
+#if TEST_01
+            divisor = 2; //割る数
+            remainder = 1; //剰余
+            DoWork();
+            return;
+
+#endif
             if (IsMainProcess)
             {
                 this.Text = "依頼する側";
@@ -364,13 +387,20 @@ namespace DoCoordination
                 this.AppendButton.Enabled = false;
                 this.ControlBox = false;
                 this.StartPosition = FormStartPosition.Manual;
-                //this.Location = GetStartLocation();
+                this.Location = GetStartLocation();
+                GetTargetPattern();
                 //タイマーの時間より短いと再入が発生する想定
-                StartTimer(new ElapsedEventHandler(OnTimerEventAsync), 300);
+                StartTimer(new ElapsedEventHandler(OnTimerEventAsync), 1000);
             }
         }
-        #endregion
 
-
+        internal int divisor; //割る数
+        internal int remainder; //剰余
+        private void GetTargetPattern()
+        {
+            this.divisor = int.Parse(Environment.GetCommandLineArgs()[3]);
+            this.remainder = int.Parse(Environment.GetCommandLineArgs()[4]);
+        }
+#endregion
     }
 }
