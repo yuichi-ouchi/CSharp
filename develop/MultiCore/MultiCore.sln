@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressReport", "ProgressR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressReportWithCancel", "ProgressReportWithCancel\ProgressReportWithCancel.csproj", "{184AEC5E-AD99-4F11-904F-691683848ED7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelProc", "ParallelProc\ParallelProc.csproj", "{1F2F243F-AA8A-4008-BEA0-04B4B492042A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -122,6 +124,12 @@ Global
 		{184AEC5E-AD99-4F11-904F-691683848ED7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{184AEC5E-AD99-4F11-904F-691683848ED7}.TEST_01|Any CPU.ActiveCfg = Release|Any CPU
 		{184AEC5E-AD99-4F11-904F-691683848ED7}.TEST_01|Any CPU.Build.0 = Release|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.TEST_01|Any CPU.ActiveCfg = Release|Any CPU
+		{1F2F243F-AA8A-4008-BEA0-04B4B492042A}.TEST_01|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
