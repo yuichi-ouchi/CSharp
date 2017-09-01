@@ -1,6 +1,6 @@
 ﻿namespace DNF2
 {
-    partial class DNF2_Form
+    partial class DNF2_BGWForm
     {
         /// <summary>
         /// 必要なデザイナー変数です。
@@ -30,6 +30,7 @@
         {
             this.textBox = new System.Windows.Forms.TextBox();
             this.startButton = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // textBox
@@ -44,7 +45,7 @@
             // 
             // startButton
             // 
-            this.startButton.Location = new System.Drawing.Point(179, 12);
+            this.startButton.Location = new System.Drawing.Point(179, 16);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(93, 23);
             this.startButton.TabIndex = 1;
@@ -52,14 +53,19 @@
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
-            // DNF2_Form
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.CallDoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.Completed);
+            // 
+            // DNF2_BGWForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.textBox);
-            this.Name = "DNF2_Form";
+            this.Name = "DNF2_BGWForm";
             this.Text = ".NET 2.0 (A)";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -70,6 +76,7 @@
 
         private System.Windows.Forms.TextBox textBox;
         private System.Windows.Forms.Button startButton;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

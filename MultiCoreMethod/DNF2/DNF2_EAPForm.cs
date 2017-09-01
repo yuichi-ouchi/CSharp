@@ -1,38 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Runtime.Remoting.Messaging;
+﻿using AsyncWorkers;
+using System;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using AsyncWorkers;
 
 namespace DNF2
 {
-    public partial class DNF2_Form : Form
+    public partial class DNF2_EAPForm : Form
     {
-        public DNF2_Form()
+        public DNF2_EAPForm()
         {
             InitializeComponent();
         }
 
+        private int _clickThreadId;
+        private int _callbackThreadId;
         private DateTime _start;
         private DateTime _stop;
+
+
+        #region " events "
         private void startButton_Click(object sender, EventArgs e)
         {
             this._start = DateTime.Now;
             this._clickThreadId = Thread.CurrentThread.ManagedThreadId;
-            this.textBox.Text = string.Format("開始: {0:HH:mm:ss.fff}",this._start);
+            this.textBox.Text = string.Format("開始: {0:HH:mm:ss.fff}", this._start);
 
             EapWorker worker = new EapWorker();
             worker.DoWoorkCompleted += Completed;
             worker.DoWorkAsync(2);
         }
+        #endregion
 
-        private int _clickThreadId;
-        private int _callbackThreadId;
-        private delegate void SetTextboxDelegate(string msg);
 
         private void ShowResult(EapWorker worker)
         {
@@ -49,7 +48,6 @@ namespace DNF2
             //else
 #endif
             this.textBox.Text = msg;
-
         }
 
         private string FormatResult(DateTime start, DateTime stop, EapWorker worker, int threadIdStart, int threadIdCallback)
@@ -64,23 +62,12 @@ namespace DNF2
             return sb.ToString();
         }
 
-        /// <summary>
-        /// 非同期処理完了時の処理 
-        /// </summary>
-        /// <remarks>
-        /// この処理の実行はUIスレッドで実行されることが保証されている
-        /// </remarks>
         private void Completed(object sender, DoWorkCompletedEventArgs e)
         {
             this._stop = DateTime.Now;
             this._callbackThreadId = Thread.CurrentThread.ManagedThreadId;
             EapWorker result = e.Worker;
             ShowResult(result);
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-
         }
     }
 }

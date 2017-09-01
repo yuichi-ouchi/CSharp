@@ -1,46 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using AsyncWorkers;
+﻿using AsyncWorkers;
+using System;
 using System.ComponentModel;
+using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
-namespace DNF35
+namespace DNF2
 {
-    /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class DNF2_BGWForm : Form
     {
-        public MainWindow()
+        public DNF2_BGWForm()
         {
             InitializeComponent();
         }
-        private Worker _worker;
-        private int _clickThreadId;
-        private int _callbackThreadId;
+
         private DateTime _start;
         private DateTime _stop;
+        private int _clickThreadId;
+        private int _callbackThreadId;
 
-        private void startButton_Click(object sender, RoutedEventArgs e)
+        #region " events "
+        private void startButton_Click(object sender, EventArgs e)
         {
-            var bw = new BackgroundWorker() { WorkerReportsProgress = true};
-            bw.DoWork += (o, arg) => CallDoWork(o, arg);
-            bw.RunWorkerCompleted += (o, arg) => Completed(o, arg);
+            this._start = DateTime.Now;
+            this._clickThreadId = Thread.CurrentThread.ManagedThreadId;
+            this.textBox.Text = string.Format("開始: {0:HH:mm:ss.fff}", this._start);
 
-            bw.RunWorkerAsync();
+            this.backgroundWorker1.RunWorkerAsync();
         }
+        #endregion
 
         #region " Update UI "
         private delegate void SetTextboxDelegate(string msg);
@@ -53,6 +41,12 @@ namespace DNF35
 
         private void SetTextboxText(string msg)
         {
+#if false
+            // BackgroundWorker利用の場合不要
+            //if (this.InvokeRequired)
+            //    this.Invoke(new SetTextboxDelegate(SetTextboxText), msg);
+            //else
+#endif
             this.textBox.Text = msg;
         }
 

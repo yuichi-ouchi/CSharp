@@ -1,6 +1,6 @@
 ﻿namespace DNF2
 {
-    partial class Form2
+    partial class DNF2_EAPForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,14 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.startButton = new System.Windows.Forms.Button();
             this.textBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // startButton
             // 
-            this.startButton.Location = new System.Drawing.Point(179, 6);
+            this.startButton.Location = new System.Drawing.Point(179, 12);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(93, 23);
             this.startButton.TabIndex = 3;
@@ -52,25 +51,22 @@
             this.textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox.Size = new System.Drawing.Size(284, 203);
             this.textBox.TabIndex = 2;
-            this.textBox.TextChanged += new System.EventHandler(this.textBox_TextChanged);
             // 
-            // Form2
+            // DNF2_EAPForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.textBox);
-            this.Name = "Form2";
-            this.Text = "Form2";
+            this.Name = "DNF2_EAPForm";
+            this.Text = ".NET 2.0(B)";
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Button startButton;
         private System.Windows.Forms.TextBox textBox;
     }

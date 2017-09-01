@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncWorkers", "AsyncWorker
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNF35", "DNF35\DNF35.csproj", "{A5A5BCB5-F3A5-4D28-A8E2-0F7F225F4C26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNF4", "DNF4\DNF4.csproj", "{CF85C93E-BB56-43E0-B9FC-12ACC58CFC44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A5A5BCB5-F3A5-4D28-A8E2-0F7F225F4C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5A5BCB5-F3A5-4D28-A8E2-0F7F225F4C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5A5BCB5-F3A5-4D28-A8E2-0F7F225F4C26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF85C93E-BB56-43E0-B9FC-12ACC58CFC44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF85C93E-BB56-43E0-B9FC-12ACC58CFC44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF85C93E-BB56-43E0-B9FC-12ACC58CFC44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF85C93E-BB56-43E0-B9FC-12ACC58CFC44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
