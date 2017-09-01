@@ -1,0 +1,9 @@
+Z:\PGM\MultiCore\WorkInfinite2\bin\Release\WorkInfinite.exe.config
+Z:\PGM\MultiCore\WorkInfinite2\bin\Release\WorkInfinite.exe
+Z:\PGM\MultiCore\WorkInfinite2\bin\Release\WorkInfinite.pdb
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite2.Form1.resources
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite.Properties.Resources.resources
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite.csproj.GenerateResource.Cache
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite.exe
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite.pdb
+Z:\PGM\MultiCore\WorkInfinite2\obj\Release\WorkInfinite.csprojResolveAssemblyReference.cache
